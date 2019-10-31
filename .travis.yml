@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t alextagger/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run alextagger/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t alextagger/multi-client ./client
+  - docker build -t alextagger/multi-nginx ./nginx
+  - docker build -t alextagger/multi-server ./server
+  - docker build -t alextagger/multi-worker ./worker
+# Log in to the docker CLI
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+# Take those images and push them to docker hub
+- docker push alextagger/multi-client
+- docker push alextagger/multi-nginx
+- docker push alextagger/multi-server
+- docker push alextagger/multi-worker
