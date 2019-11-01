@@ -5,8 +5,11 @@ services:
 before_install:
   - docker build -t alextagger/react-test -f ./client/Dockerfile.dev ./client
 
+# script:
+#  - docker run alextagger/react-test npm test -- --coverage
+
 script:
-  - docker run alextagger/react-test npm test -- --coverage
+  - docker run -e CI=true alextagger/react-test npm test
 
 after_success:
   - docker build -t alextagger/multi-client ./client
@@ -20,3 +23,5 @@ after_success:
 - docker push alextagger/multi-nginx
 - docker push alextagger/multi-server
 - docker push alextagger/multi-worker
+
+language: generic
